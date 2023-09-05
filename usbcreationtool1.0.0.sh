@@ -343,9 +343,7 @@ if [[ $latest_release_tag > $current_version ]]; then
         clear
         echo " "
         echo " Installing the update..."
-        git init
-        git remote add origin https://github.com/GiovsTech/USBCreationTool.git
-        git pull origin master
+        wget https://github.com/GiovsTech/USBCreationTool/releases/download/1.0.0/usbcreationtool.sh
         echo " "
         echo " "
         echo " Update installed successfully. Please run the new updated script."
