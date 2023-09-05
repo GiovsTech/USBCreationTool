@@ -17,13 +17,13 @@ fi
 
 if ! which wget > /dev/null; then
    clear
-   echo " GIT package not detected. Please install it and run the program again."
+   echo " WGET package not detected. Please install it and run the program again."
    exit 1
 fi
 
 if ! which parted > /dev/null; then
    clear
-   echo " GIT package not detected. Please install it and run the program again."
+   echo " PARTED package not detected. Please install it and run the program again."
    exit 1
 fi
 
