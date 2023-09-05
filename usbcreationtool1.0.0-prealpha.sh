@@ -28,8 +28,6 @@ if ! which parted > /dev/null; then
 fi
 
 ## Manual way
-
-
 inj_pr_manual(){
         mkdir /mnt/ISOCreationTool
         mkdir /mnt/USBCreationTool
@@ -69,6 +67,7 @@ inj_pr_manual(){
         echo " ISO image successfully injected in USB drive."
         echo " To unmount your USB drive, run the script with "
         echo " the option '-u usb_drive_name'."
+        umount -f /mnt/ISOCreationTool
         exit 0
         else
         umount -f /mnt/ISOCreationTool
@@ -132,6 +131,10 @@ clear
        done
 echo " "
 echo " USB Disk successfully unmounted."
+echo " "
+echo " Removing working directory."
+rm -r /mnt/ISOCreationTool
+rm -r /mnt/USBCreationTool
 exit 0
 fi
 
@@ -241,27 +244,47 @@ echo " "
 echo " "
 read -s -r -p "   - Press any key to continue..."
 if [ -d /mnt/USBCreationTool ]; then
+rm -rf /mnt/USBCreationTool
+if [ -d /mnt/ISOCreationTool ]; then
+rm -rf /mnt/ISOCreationTool
   if mount | grep "/mnt/USBCreationTool" > /dev/null; then
     umount -f /mnt/USBCreationTool
     umount -f /mnt/ISOCreationTool
     mainmenu
   fi
+ fi
 fi
 mainmenu
 }
 
 quit ()
 {
-  if [ -d /mnt/USBCreationTool ]; then
-  if mount | grep "/mnt/USBCreationTool" > /dev/null; then
-    echo " " 
-    echo " Unmounting the USB drive"
-    umount -f /mnt/ISOCreationTool 
-    umount -f /mnt/USBCreationTool
-  fi
-  rm -r /mnt/USBCreationTool
-  rm -r /mnt/ISOCreationTool
-fi
+  clear
+  echo " "
+  echo "   #####################################################"
+  echo "  #                  USBCreationTool                  #"
+  echo " #####################################################"
+  echo " "
+  echo " USBCreationTool version $current_version"
+  echo " "
+  echo " Developed by GiovsTech"
+  echo " "
+  echo " "
+  echo " GitHub Repository [https://github.com/GiovsTech/USBCreationTool]"
+  echo " Report an issue [https://github.com/GiovsTech/USBCreationTool/issues]"
+  echo " "
+  echo " Have a good day!"
+  echo " "
+  echo " "
+  read -s -r -p "   - Press any key to exit..."
+  exit 0
+}
+
+inj_quit(){
+  umount -f /mnt/ISOCreationTool 
+  umount -f /mnt/USBCreationTool
+  rm -rf /mnt/USBCreationTool
+  rm -rf /mnt/ISOCreationTool
   clear
   echo " "
   echo "   #####################################################"
@@ -389,7 +412,7 @@ inj_pr(){
         echo " "
         echo " Injecting the file ISO to the USB drive $disk_path..."
         cp -v -r /mnt/ISOCreationTool/* /mnt/USBCreationTool
-        quit
+        inj_quit
         else
         umount -f /mnt/ISOCreationTool
         umount -f /mnt/USBCreationTool
