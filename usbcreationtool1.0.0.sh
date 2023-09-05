@@ -333,7 +333,7 @@ if [[ $latest_release_tag > $current_version ]]; then
         clear
         echo " "
         echo " Installing the update..."
-        wget https://github.com/GiovsTech/USBCreationTool/releases/download/1.0.0/usbcreationtool.sh
+        git clone https://github.com/GiovsTech/USBCreationTool.git
         echo " "
         echo " "
         echo " Update installed successfully. Please run the new updated script."
@@ -343,7 +343,7 @@ if [[ $latest_release_tag > $current_version ]]; then
         clear
         echo " "
         echo " Installing the update..."
-        wget https://github.com/GiovsTech/USBCreationTool/releases/download/1.0.0/usbcreationtool.sh
+        git clone https://github.com/GiovsTech/USBCreationTool.git
         echo " "
         echo " "
         echo " Update installed successfully. Please run the new updated script."
