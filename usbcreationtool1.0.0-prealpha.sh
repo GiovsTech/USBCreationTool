@@ -30,8 +30,198 @@ fi
 ## Manual way
 
 
+inj_pr_manual(){
+        mkdir /mnt/ISOCreationTool
+        mkdir /mnt/USBCreationTool
+        mount "$iso_path" /mnt/ISOCreationTool -o loop
+        partitions=$(lsblk -l | grep "^$disk_path" | awk '{print $4}')
+        for partition in $partitions; do
+        if findmnt "$partition" | grep "$partition" ; then
+        umount -f "$partition"
+       fi 
+       done
+        clear
+        echo " "
+        echo " Partitioning the USB drive..."
+        if [[ "$iso_path" == *"Win"* ]]; then
+        parted "$disk_path" mklabel msdos
+        else
+        parted "$disk_path" mklabel gpt
+        fi
+        parted "$disk_path" mkpart primary fat32 0% 100%
+        parted "$disk_path" set 1 boot on
+        clear
+        exit_code=$?
+       if [[ $exit_code -eq 0 ]]; then
+        echo " "
+        echo " The partitioning step is successfully completed."
+        echo " "
+        echo " Formatting the usb drive "
+        p=1
+        mkfs.fat -F32 "$disk_path$p"
+        mount "$disk_path$p" /mnt/USBCreationTool
+        exit_code_mk=$?
+        if [[ $exit_code_mk -eq 0 ]]; then
+        echo " "
+        echo " Injecting the file ISO to the USB drive $disk_path..."
+        cp -v -r /mnt/ISOCreationTool/* /mnt/USBCreationTool
+        echo " "
+        echo " ISO image successfully injected in USB drive."
+        echo " To unmount your USB drive, run the script with "
+        echo " the option '-u usb_drive_name'."
+        exit 0
+        else
+        umount -f /mnt/ISOCreationTool
+        umount -f /mnt/USBCreationTool
+        rm -r /mnt/ISOCreationTool
+        rm -f /mnt/USBCreationTool
+        echo "" 
+        echo " An error was encoutered"
+        exit $exit_code_mk
+        fi
+        
+       else
+        umount -f /mnt/ISOCreationTool
+        umount -f /mnt/USBCreationTool
+        rm -r /mnt/ISOCreationTool
+        rm -f /mnt/USBCreationTool
+        echo "" 
+        echo " An error was encoutered"
+        exit $exit_code
+       fi
+      
+}
+
+verbose=$1
+d=$2
+device=$3
+iso=$4
+iso_file=$5
+
+if [[ $1 == "-h" ]]; then
+clear
+echo " "
+echo "   #####################################################"
+echo "  #                 USBCreationTool                 #"
+echo " #####################################################"
+echo " "
+echo " USBCreationTool is a simple bash script that helps"
+echo " you to make a bootable USB in a short time. "
+echo " This script is set in manual mode. If you want to run "
+echo " the scripted mode, don't write any arguments. "
+echo " "
+echo " List of available commands: "
+echo "  -h  show this help text"
+echo "  -v  set the manual mode"
+echo "  -d (followed by your USB Drive path) sets your USB drive path "
+echo "  -i (followed by your ISO image file) sets your ISO image file "
+echo " "
+echo "  Note: These commands ( -d, -i ) have to be executed with -V (verbose option)"
+echo " "
+echo "  -u (followed by your USB drive path) unmount your USB drive, removing also the folder where it was mounted. "
+exit
+fi
+
+if [[ $1 == "-u" ]]; then
+clear
+ partitions=$(lsblk -l | grep "^$2" | awk '{print $4}')
+        for partition in $partitions; do
+        if findmnt "$partition" | grep "$partition" ; then
+        umount -f "$partition"
+       fi 
+       done
+echo " "
+echo " USB Disk successfully unmounted."
+exit 0
+fi
+
+
+if [[ $verbose == "-v" ]]; then
+  echo " "
+  echo " USBCreationTool is set in manual mode. "
+  echo " "
+  clear
+  if [[ $d == "-d" ]]; then
+  disk_path=$device
+  if [[ $iso == "-i" ]]; then
+  iso_path=$iso_file
+  inj_pr_manual
+  else
+clear
+echo " "
+echo "   #####################################################"
+echo "  #                 USBCreationTool                 #"
+echo " #####################################################"
+echo " "
+echo " Command not found. "
+echo " "
+echo " USBCreationTool is a simple bash script that helps"
+echo " you to make a bootable USB in a short time. "
+echo " This script is set in manual mode. If you want to run "
+echo " the scripted mode, don't write any arguments. "
+echo " "
+echo " List of available commands: "
+echo "  -h  show this help text"
+echo "  -v  set the manual mode"
+echo "  -d (followed by your USB Drive path) sets your USB drive path "
+echo "  -i (followed by your ISO image file) sets your ISO image file "
+echo " "
+echo "  Note: These commands ( -d, -i ) have to be executed with -V (verbose option)"
+echo " "
+echo "  -u (followed by your USB drive path) unmount your USB drive, removing also the folder where it was mounted. "
+  fi
+  else
+clear
+echo " "
+echo "   #####################################################"
+echo "  #                 USBCreationTool                 #"
+echo " #####################################################"
+echo " "
+echo " Command not found. "
+echo " "
+echo " USBCreationTool is a simple bash script that helps"
+echo " you to make a bootable USB in a short time. "
+echo " This script is set in manual mode. If you want to run "
+echo " the scripted mode, don't write any arguments. "
+echo " "
+echo " List of available commands: "
+echo "  -h  show this help text"
+echo "  -v  set the manual mode"
+echo "  -d (followed by your USB Drive path) sets your USB drive path "
+echo "  -i (followed by your ISO image file) sets your ISO image file "
+echo " "
+echo "  Note: These commands ( -d, -i ) have to be executed with -V (verbose option)"
+echo " "
+echo "  -u (followed by your USB drive path) unmount your USB drive, removing also the folder where it was mounted. "
+  fi
+else
+clear
+echo " "
+echo "   #####################################################"
+echo "  #                 USBCreationTool                 #"
+echo " #####################################################"
+echo " "
+echo " Command not found. "
+echo " "
+echo " USBCreationTool is a simple bash script that helps"
+echo " you to make a bootable USB in a short time. "
+echo " This script is set in manual mode. If you want to run "
+echo " the scripted mode, don't write any arguments. "
+echo " "
+echo " List of available commands: "
+echo "  -h  show this help text"
+echo "  -v  set the manual mode"
+echo "  -d (followed by your USB Drive path) sets your USB drive path "
+echo "  -i (followed by your ISO image file) sets your ISO image file "
+echo " "
+echo "  Note: These commands ( -d, -i ) have to be executed with -V (verbose option)"
+echo " "
+echo "  -u (followed by your USB drive path) unmount your USB drive, removing also the folder where it was mounted. "
+fi
+
 
 ## Scripted Way
+main(){
 clear
 clear
 echo " "
@@ -50,6 +240,15 @@ echo " select your custom ISO file, of course!"
 echo " "
 echo " "
 read -s -r -p "   - Press any key to continue..."
+if [ -d /mnt/USBCreationTool ]; then
+  if mount | grep "/mnt/USBCreationTool" > /dev/null; then
+    umount -f /mnt/USBCreationTool
+    umount -f /mnt/ISOCreationTool
+    mainmenu
+  fi
+fi
+mainmenu
+}
 
 quit ()
 {
@@ -272,7 +471,7 @@ injecting_mainmenu ()
           echo " Download the latest Arch Linux ISO"
           if [[ ! -f "/tmp/archlinux-x86_64.iso" ]]; then
           wget https://geo.mirror.pkgbuild.com/iso/latest/archlinux-x86_64.iso -P /tmp/
-           exit_code_mk=$?
+           exit_code_ar=$?
            if [[ $exit_code_ar -eq 0 ]]; then
            echo " "
            echo " The latest Arch Linux ISO is downloaded."
@@ -298,7 +497,7 @@ injecting_mainmenu ()
           echo " Download the latest Ubuntu Lunar Lobster ISO"
           if [[ ! -f "/tmp/ubuntu-23.04-desktop-amd64.iso" ]]; then
            wget https://releases.ubuntu.com/23.04/ubuntu-23.04-desktop-amd64.iso -P /tmp/
-           exit_code_mk=$?
+           exit_code_ub=$?
            if [[ $exit_code_ub -eq 0 ]]; then
            echo " "
            echo " The Ubuntu Lunar Lobster ISO is downloaded."
@@ -325,8 +524,8 @@ injecting_mainmenu ()
           echo " Download the latest Debian 12 ISO"
           if [[ ! -f "/tmp/debian-12.1.0-amd64-netinst.iso" ]]; then
            wget https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.1.0-amd64-netinst.iso -P /tmp/
-           exit_code_mk=$?
-           if [[ $exit_code_ar -eq 0 ]]; then
+           exit_code_db=$?
+           if [[ $exit_code_db -eq 0 ]]; then
            echo " "
            echo " The latest Debian 12 is downloaded."
            echo " Now, let's inject your ISO in your USB Drive."
@@ -335,7 +534,7 @@ injecting_mainmenu ()
         else 
         echo "" 
         echo " An error was encoutered"
-        exit $exit_code_ar
+        exit $exit_code_db
       fi
           else
           echo "" 
@@ -424,12 +623,6 @@ mainmenu ()
    esac
   done
 }
-
-if [ -d /mnt/USBCreationTool ]; then
-  if mount | grep "/mnt/USBCreationTool" > /dev/null; then
-    umount -f /mnt/USBCreationTool
-    umount -f /mnt/ISOCreationTool
-    mainmenu
-  fi
+if [[ $1 == "" ]]; then
+main
 fi
-mainmenu
